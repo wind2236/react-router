@@ -1,0 +1,136 @@
+import React, { PropTypes, Component } from 'react'
+import { Block, Row, Column } from 'jsxstyle'
+import { DARK_GRAY, RED } from '../../Theme'
+
+const Button = ({ children, ...props }) => (
+  <Block
+    component="button"
+    color="#fff"
+    padding="9px 0"
+    background={RED}
+    borderRadius={0}
+    cursor="pointer"
+    border="none"
+    textShadow="none"
+    minWidth="80px"
+    children={children}
+    {...props}
+  />
+)
+
+const Input = (props) => (
+  <Block
+    component="input"
+    component="input"
+    padding="10px 8px"
+    border="1px solid #d6d6d6"
+    borderRadius="0"
+    backgroundColor="white"
+    margin="0"
+    marginRight="1%"
+    height="42px"
+    flex="1"
+    props={props}
+  />
+)
+
+export default class NewsletterSignup extends Component {
+  static propTypes = {
+    tags: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
+  }
+
+  static defaultProps = {
+    tags: '125835',
+    id: '129214',
+  }
+
+  state = {
+    submitted: false,
+    name: '',
+    email: '',
+  }
+
+  getReqURI = () => {
+   const info = {
+      id: this.props.id,
+      api_key: '0DZDEQZjU_laOYXzD6cQRA',
+      name: this.state.name.trim(),
+      email: this.state.email.trim(),
+      tags: this.props.tags,
+    }
+
+    return Object.keys(info).reduce((prev, next, index) => {
+      const and = index === 0 ? '' : '&'
+      return prev + and + next + '=' + info[next]
+    }, '')
+  }
+
+  handleSubmit = (e) => {
+    e.preventDefault()
+    if (this.state.email) {
+      const request = new XMLHttpRequest()
+      request.open('POST', `//api.convertkit.com/v3/forms/129214/subscribe?${this.getReqURI()}`, true)
+      request.onload = () => {
+        if (request.status >= 200 && request.status < 400) {
+          this.setState({
+            email: '',
+            name: '',
+            submitted: true
+          })
+        }
+      }
+      request.send()
+    }
+  }
+
+  render () {
+    const { submitted, name, email } = this.state
+    return (
+      <Block background="white" padding="80px">
+        <Block
+          width="65%"
+          margin="auto"
+          paddingBottom="40px"
+          textAlign="center"
+          fontSize="150%"
+          fontWeight="bold"
+        >
+          Sign up to receive updates about React Router, our workshops,
+          online courses, and more:
+        </Block>
+        <form onSubmit={this.handleSubmit}>
+          {submitted ? (
+            <Block color='white' textAlign='center'>
+              Thank you for signing up :)
+            </Block>
+          ) : (
+            <Row
+              justifyContent="space-around"
+              width="500px"
+              margin="auto"
+            >
+              <Input
+                value={name}
+                onChange={(e) => this.setState({ name: e.target.value })}
+                type="text"
+                name="name"
+                placeholder="FIRST NAME"
+              />
+              <Input
+                value={email}
+                onChange={(e) => this.setState({ email: e.target.value })}
+                type="email"
+                name="email"
+                placeholder="EMAIL ADDRESS"
+              />
+              <Button type="submit">
+                Subscribe
+              </Button>
+            </Row>
+          )}
+        </form>
+      </Block>
+    )
+  }
+}

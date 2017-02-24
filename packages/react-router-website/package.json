@@ -37,6 +37,7 @@
   },
   "dependencies": {
     "cheerio": "^0.22.0",
+    "react-media": "^1.5.1",
     "slug": "^0.9.1"
   }
 }
