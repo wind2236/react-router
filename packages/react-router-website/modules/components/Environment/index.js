@@ -9,17 +9,15 @@ const envData = {
   core: require('bundle?lazy!./CoreData')
 }
 
-const Environment = ({ match: { params: { environment }}}) => (
+const Environment = ({ match, match: { params: { environment }}}) => (
   <Bundle load={envData[environment]}>
     {(data) => data ? (
-      <LargeScreen data={data} environment={environment}/>
+      <LargeScreen data={data} match={match}/>
     ) : (
       <Block>Loading...</Block>
     )}
   </Bundle>
 )
-
-console.log('hi')
 
 export default Environment
 

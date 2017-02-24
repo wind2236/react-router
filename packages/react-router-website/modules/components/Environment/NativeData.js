@@ -1,3 +1,5 @@
-export default [
-  require('../../../../react-router-native/docs/NativeRouter.md')
-]
+export default {
+  api: [
+    require('../../../../react-router-native/docs/NativeRouter.md')
+  ]
+}

@@ -55,12 +55,12 @@ const envMap = {
   'react-router-dom': 'web'
 }
 
-const correctLinkHrefs = ($, title, environment) => {
+const correctLinks = ($, moduleSlug, environment) => {
   // correct header links
   $(`a.${routerDelegationClassName}`).each((i, e) => {
     const $e = $(e)
-    const href = $e.attr('href')
-    $(e).attr('href', `/${environment}/api/${title}/${href}`)
+    const slug = $e.attr('href')
+    $e.attr('href', `/${environment}/api/${moduleSlug}/${slug}`)
   })
 
   // correct the rest of the links
@@ -76,7 +76,7 @@ const correctLinkHrefs = ($, title, environment) => {
     // from github: href="#render-func"
     // to website:  href="/web/api/Route/render-func"
     if (isSamePage) {
-      $e.attr('href', `/${environment}/api/${title}/${href.substr(1)}`)
+      $e.attr('href', `/${environment}/api/${moduleSlug}/${href.substr(1)}`)
     }
 
     // from github: href="context.router.md"
@@ -100,8 +100,14 @@ const correctLinkHrefs = ($, title, environment) => {
       $e.addClass(routerDelegationClassName)
     }
   })
+}
 
-  return $.html()
+const correctHeaderIds = ($, moduleSlug, environment) => {
+  $('h1, h2').each((i, e) => {
+    const $e = $(e)
+    const slug = $e.attr('id')
+    $e.attr('id', `${moduleSlug}-${slug}`)
+  })
 }
 
 const md = markdownIt({
@@ -120,13 +126,14 @@ const md = markdownIt({
 
 module.exports = function (content) {
   this.cacheable()
-  console.log(this.data.environment)
   const markup = md.render(content)
   const $markup = cheerio.load(markup)
   const headers = extractHeaders($markup, 'h2')
   const title = extractHeaders($markup, 'h1')[0]
+  correctLinks($markup, title.slug, this.data.environment)
+  correctHeaderIds($markup, title.slug, this.data.environment)
   this.value = {
-    markup: correctLinkHrefs($markup, title.slug, this.data.environment),
+    markup: $markup.html(),
     headers: headers,
     title: title
   }
