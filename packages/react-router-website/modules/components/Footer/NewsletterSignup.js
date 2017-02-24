@@ -1,6 +1,7 @@
 import React, { PropTypes, Component } from 'react'
-import { Block, Row, Column } from 'jsxstyle'
+import { Block, Row, Flex } from 'jsxstyle'
 import { DARK_GRAY, RED } from '../../Theme'
+import SmallScreen from '../SmallScreen'
 
 const Button = ({ children, ...props }) => (
   <Block
@@ -18,7 +19,7 @@ const Button = ({ children, ...props }) => (
   />
 )
 
-const Input = (props) => (
+const Input = ({ margin, ...props}) => (
   <Block
     component="input"
     component="input"
@@ -26,11 +27,10 @@ const Input = (props) => (
     border="1px solid #d6d6d6"
     borderRadius="0"
     backgroundColor="white"
-    margin="0"
-    marginRight="1%"
     height="42px"
     flex="1"
     props={props}
+    margin={margin}
   />
 )
 
@@ -87,50 +87,59 @@ export default class NewsletterSignup extends Component {
   render () {
     const { submitted, name, email } = this.state
     return (
-      <Block background="white" padding="80px">
-        <Block
-          width="65%"
-          margin="auto"
-          paddingBottom="40px"
-          textAlign="center"
-          fontSize="150%"
-          fontWeight="bold"
-        >
-          Sign up to receive updates about React Router, our workshops,
-          online courses, and more:
-        </Block>
-        <form onSubmit={this.handleSubmit}>
-          {submitted ? (
-            <Block color='white' textAlign='center'>
-              Thank you for signing up :)
-            </Block>
-          ) : (
-            <Row
-              justifyContent="space-around"
-              width="500px"
+      <SmallScreen>
+        {(isSmallScreen) => (
+          <Block
+            background="white"
+            maxWidth="700px"
+            margin="auto"
+            padding={isSmallScreen ? '40px' : '80px'}
+          >
+            <Block
               margin="auto"
+              paddingBottom={isSmallScreen ? '20px' : '40px'}
+              textAlign="center"
+              fontSize={isSmallScreen ? '100%' : '150%'}
+              fontWeight="bold"
             >
-              <Input
-                value={name}
-                onChange={(e) => this.setState({ name: e.target.value })}
-                type="text"
-                name="name"
-                placeholder="FIRST NAME"
-              />
-              <Input
-                value={email}
-                onChange={(e) => this.setState({ email: e.target.value })}
-                type="email"
-                name="email"
-                placeholder="EMAIL ADDRESS"
-              />
-              <Button type="submit">
-                Subscribe
-              </Button>
-            </Row>
-          )}
-        </form>
-      </Block>
+              Sign up to receive updates about React Router, our workshops,
+              online courses, and more:
+            </Block>
+            <form onSubmit={this.handleSubmit}>
+              {submitted ? (
+                <Block color='white' textAlign='center'>
+                  Thank you for signing up :)
+                </Block>
+              ) : (
+                <Flex
+                  flexDirection={isSmallScreen ? 'column' : 'row'}
+                  justifyContent="space-around"
+                >
+                  <Input
+                    value={name}
+                    onChange={(e) => this.setState({ name: e.target.value })}
+                    type="text"
+                    name="name"
+                    placeholder="FIRST NAME"
+                    margin={isSmallScreen ? '5px 0' : '0 5px'}
+                  />
+                  <Input
+                    value={email}
+                    onChange={(e) => this.setState({ email: e.target.value })}
+                    type="email"
+                    name="email"
+                    placeholder="EMAIL ADDRESS"
+                    margin={isSmallScreen ? '0 0 5px 0' : '0 5px 0 0'}
+                  />
+                  <Button type="submit">
+                    Subscribe
+                  </Button>
+                </Flex>
+              )}
+            </form>
+          </Block>
+        )}
+      </SmallScreen>
     )
   }
 }

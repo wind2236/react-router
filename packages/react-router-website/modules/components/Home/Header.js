@@ -1,44 +1,59 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Block, Row, Inline } from 'jsxstyle'
-import { LIGHT_GRAY } from '../../Theme'
+import { Block, Flex, Row, Inline } from 'jsxstyle'
+import { SMALL_SCREEN, LIGHT_GRAY, BRIGHT_GRAY } from '../../Theme'
 import Logo from './Logo'
+import SmallScreen from '../SmallScreen'
 
-const NavLink = ({ to, href, ...props }) => (
+const NavLink = ({ href, ...props }) => (
   <Block
-    component={to ? Link : 'a'}
-    props={{ to, href }}
+    component="a"
+    props={{ href }}
     margin="0 10px"
-    cursor="pointer"
     {...props}
   />
 )
 
-const Button = ({ to, ...props }) => (
-  <Block
-    component={Link}
-    props={{ to }}
-    padding="15px 25px"
-    textTransform="uppercase"
-    cursor="pointer"
-    fontSize="10px"
-    fontWeight="bold"
-    userSelect="none"
+const Button = ({ to, small, ...props }) => (
+  <Block component={Link}
+    activeBoxShadow="2px 2px 4px rgba(0,0,0,.25)"
+    activeTop="5px"
     background="white"
     borderRadius="100px"
-    boxShadow="0 10px 30px rgba(0, 0, 0, .25)"
-    hoverBoxShadow="0 10px 25px rgba(0,0,0,.25)"
-    activeBoxShadow="2px 2px 4px rgba(0,0,0,.25)"
-    position="relative"
-    top="0"
+    boxShadow={small ? (
+      '0 5px 15px rgba(0, 0, 0, .25)'
+    ) : (
+      '0 10px 30px rgba(0, 0, 0, .25)'
+    )}
+    cursor="pointer"
+    flex="1"
+    fontSize="10px"
+    fontWeight="bold"
+    hoverBoxShadow={small ? (
+      '0 5px 10px rgba(0, 0, 0, .25)'
+    ) : (
+      '0 10px 25px rgba(0, 0, 0, .25)'
+    )}
     hoverTop="1px"
-    activeTop="5px"
+    marginRight={small ? '10px' : '20px'}
+    padding={small ? '10px' : '15px 25px'}
+    position="relative"
+    props={{ to }}
+    textAlign="center"
+    textTransform="uppercase"
+    top="0"
+    userSelect="none"
+    whiteSpace="nowrap"
     {...props}
   />
 )
 
 const NavBar = () => (
-  <Row textTransform="uppercase" fontWeight="bold" width="100%">
+  <Row
+    textTransform="uppercase"
+    fontWeight="bold"
+    width="100%"
+  >
     <Block flex="1" fontSize="14px">
       <Inline component="a" props={{ href:"https://reacttraining.com" }}>
         React Training
@@ -51,33 +66,45 @@ const NavBar = () => (
       >React Router</Inline>
     </Block>
     <Row fontSize="12px">
-      <NavLink href="https://github.com/ReactTraining/react-router">GitHub</NavLink>
+      <NavLink href="https://github.com/ReactTraining/react-router">Github</NavLink>
       <NavLink href="https://www.npmjs.com/package/react-router">NPM</NavLink>
-      <NavLink href="https://reacttraining.com">Get Training</NavLink>
+      <NavLink href="https://reacttraining.com" margin="0">Get Training</NavLink>
     </Row>
   </Row>
 )
 
-const Header = () => (
-  <Block background="linear-gradient(125deg, #fff, #f3f3f3 41%, #ededed 0, #fff)">
-    <Block padding="20px" maxWidth="1000px" margin="auto" >
-      <NavBar/>
-      <Block height="40px"/>
+const Banner = () => (
+  <SmallScreen>
+    {(isSmallScreen) => (
       <Row width="100%">
-        <Block flex="1">
-          <Logo />
-        </Block>
+        {!isSmallScreen && (
+          <Block flex="1">
+            <Logo />
+          </Block>
+        )}
         <Block flex="1">
           <Block lineHeight="1">
-            <Block textTransform="uppercase" fontSize="20px" fontWeight="bold">
+            <Block
+              textTransform="uppercase"
+              fontSize={isSmallScreen ? '80%' : '120%'}
+              fontWeight="bold"
+            >
               Learn once, Route anywhere
             </Block>
-            <Block component="h2" textTransform="uppercase" fontSize="350%" fontWeight="bold">
+            <Block
+              component="h2"
+              textTransform="uppercase"
+              fontSize={isSmallScreen ? '200%' : '350%'}
+              fontWeight="bold"
+            >
               React Router
             </Block>
           </Block>
 
-          <Block margin="20px 0">
+          <Block
+            margin={`${isSmallScreen ? 20 : 20}px 0`}
+            fontSize={isSmallScreen ? '80%' : null}
+          >
             Components are the heart of React's powerful, declarative
             programming model. React Router is a collection of <b>navigational
             components</b> that compose declaratively with your application. Whether
@@ -87,15 +114,31 @@ const Header = () => (
           </Block>
 
           <Row>
-            <Button to="/web" marginRight="20px" flex="1" textAlign="center">Web</Button>
-            <Button to="/native" marginRight="20px" flex="1" textAlign="center">Native</Button>
-            <Button to="/core" marginRight="20px" flex="1" textAlign="center">Anywhere</Button>
+            <Button to="/web" small={isSmallScreen}>Web</Button>
+            <Button to="/native" small={isSmallScreen}>Native</Button>
+            <Button to="/core" small={isSmallScreen}>Anywhere</Button>
           </Row>
         </Block>
       </Row>
-      <Block height="20px"/>
-    </Block>
-  </Block>
+    )}
+  </SmallScreen>
+)
+
+const Header = () => (
+  <SmallScreen query={SMALL_SCREEN}>
+    {(isSmallScreen) => (
+      <Block background="linear-gradient(125deg, #fff, #f3f3f3 41%, #ededed 0, #fff)">
+        <Block padding="20px" maxWidth="1000px" margin="auto" >
+          {!isSmallScreen && (
+            <NavBar/>
+          )}
+          <Block height={isSmallScreen ? '20px' : '40px'}/>
+          <Banner/>
+          <Block height="20px"/>
+        </Block>
+      </Block>
+    )}
+  </SmallScreen>
 )
 
 export default Header

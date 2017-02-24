@@ -3,11 +3,11 @@ import { Block, Row } from 'jsxstyle'
 import { DARK_GRAY } from '../../Theme'
 import LogoImage from '../../logo.png'
 
-const Logo = () => (
+const Logo = ({ size }) => (
   <Row
     background={DARK_GRAY}
-    width="230px"
-    height="230px"
+    width={size}
+    height={size}
     alignItems="center"
     borderRadius="50%"
     boxShadow="2px 10px 50px hsla(0, 0%, 0%, 0.35)"
