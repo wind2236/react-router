@@ -4,7 +4,6 @@ import 'prismjs/themes/prism-tomorrow.css'
 
 const MarkdownViewer = ({ html, id }) => (
   <markdown
-    id={id}
     dangerouslySetInnerHTML={{
       __html: html
     }}

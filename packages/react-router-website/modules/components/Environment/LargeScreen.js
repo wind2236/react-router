@@ -1,7 +1,8 @@
-import React, { Component } from 'react'
+import React, { Component, PropTypes } from 'react'
 import { Block, Row } from 'jsxstyle'
 import { Link, Route, Redirect, Switch } from 'react-router-dom'
 import MarkdownViewer from './MarkdownViewer'
+import { Motion, spring } from 'react-motion'
 
 const Tab = ({ to, ...rest }) => (
   <Block
@@ -19,39 +20,94 @@ const Tabs = () => (
   </Row>
 )
 
-class ScrollToDoc extends Component {
+class ScrollY extends Component {
+  static propTypes = {
+    y: PropTypes.number
+  }
+
   componentDidMount() {
     this.scroll()
   }
 
-  componentDidUpdate() {
-    this.scroll()
+  componentDidUpdate(prevProps) {
+    if (prevProps.y !== this.props.y)
+      this.scroll()
   }
 
   scroll() {
-    //console.log(this.props)
+    window.scrollTo(0, this.props.y)
   }
 
   render() {
-    return this.props.children
+    return null
+  }
+}
+
+class ScrollToDoc extends Component {
+  state = {
+    top: window.scrollY,
+    syncingMotion: false
+  }
+
+  componentDidMount() {
+    this.scroll()
+  }
+
+  componentDidUpdate(prevProps) {
+    if (
+      (prevProps.doc !== this.props.doc) ||
+      (prevProps.header !== this.props.header)
+    ) {
+      this.scroll()
+    }
+  }
+
+  scroll() {
+    const { header, doc } = this.props
+    const id = header ? (
+      `${doc.title.slug}-${header.slug}`
+    ) : (
+      doc.title.slug
+    )
+    const el = document.getElementById(id)
+    this.setState({
+      top: window.scrollY,
+      syncingMotion: true
+    }, () => {
+      this.setState({
+        top: window.scrollY + el.getBoundingClientRect().top - 80,
+        syncingMotion: false
+      })
+    })
+  }
+
+  render() {
+    const { top, syncingMotion } = this.state
+    const y = syncingMotion ? top : spring(top)
+
+    return (
+      <Motion style={{ y }}>
+        {s => (
+          <ScrollY y={Math.round(s.y)}/>
+        )}
+      </Motion>
+    )
   }
 }
 
 const Nav = ({ data, environment }) => (
-  <Block>
-
+  <Block
+    background="#f0f0f0"
+    overflow="auto"
+    position="fixed"
+    height="100vh"
+    left="0"
+    top="0"
+    bottom="0"
+    width="250px"
+    fontFamily="Monaco, monospace"
+  >
     <Tabs/>
-
-    <Block
-      component='a'
-      className="internal-link"
-      props={{
-        href: `/web/api/BrowserRouter/basename-string`
-      }}
-    >
-      GO!
-    </Block>
-
     {data.api.map((item, i) => (
       <Block
         key={i}
@@ -69,27 +125,22 @@ const Nav = ({ data, environment }) => (
 const API = ({ match, data }) => {
   const { params: { mod, header: headerParam, environment } } = match
   const doc = data.api.find(doc => mod === doc.title.slug)
-  const header = doc && header ? doc.headers.find(h => h.slug === headerParam) : true
-  //const validHeader = headerParam ? !!header : true
-  console.log(header, match.url)
+  const header = doc && headerParam ? doc.headers.find(h => h.slug === headerParam) : null
+  const invalidHeader = headerParam ? !header : false
   return (
     <Block>
       {doc ? (
-        header ? (
-          <ScrollToDoc doc={doc} header={header}>
-            <Block>
-              {data.api.map((d, i) => (
-                <MarkdownViewer
-                  html={d.markup}
-                  id={d.title.slug}
-                />
-              ))}
-            </Block>
-          </ScrollToDoc>
-        ) : console.log('redirect 1') || (
+        !invalidHeader ? (
+          <Block>
+            <ScrollToDoc doc={doc} header={header}/>
+            {data.api.map((d, i) => (
+              <MarkdownViewer html={d.markup}/>
+            ))}
+          </Block>
+        ) : (
           <Redirect to={`/${environment}/api/${mod}`}/>
         )
-      ) : console.log('redirect 2') || (
+      ) : (
         <Redirect to={`/${environment}/api`}/>
       )}
     </Block>
@@ -104,7 +155,7 @@ const Example = () => (
 
 
 const Content = ({ data, match }) => (
-  <Block flex="1" overflow="auto">
+  <Block marginLeft="300px" padding="20px">
     <Switch>
       <Route path={`${match.path}/api/:mod?/:header?`} render={(props) => <API {...props} data={data}/>}/>
       <Route path={`${match.path}/examples/:example`} component={Example} data={data}/>
@@ -114,10 +165,10 @@ const Content = ({ data, match }) => (
 )
 
 const LargeScreen = ({ data, match }) => (
-  <Row height="100vh" overflow="hidden">
+  <Block>
     <Nav data={data} environment={match.params.environment}/>
     <Content data={data} match={match}/>
-  </Row>
+  </Block>
 )
 
 export default LargeScreen

@@ -9,7 +9,6 @@
 // - highlights the code
 
 const markdownIt = require('markdown-it')
-const anchor = require('markdown-it-anchor')
 const Prism = require('prismjs')
 const cheerio = require('cheerio')
 const path = require('path')
@@ -42,9 +41,10 @@ const highlight = (str, lang) => {
 const extractHeaders = ($, level = 'h2') => (
   $(level).map((n, e) => {
     const $e = $(e)
+    const text = $e.text()
     return {
-      text: $e.text().replace('# ', ''),
-      slug: $e.find('a').attr('href')
+      text: text,
+      slug: slugify(text)
     }
   }).get()
 )
@@ -56,14 +56,6 @@ const envMap = {
 }
 
 const correctLinks = ($, moduleSlug, environment) => {
-  // correct header links
-  $(`a.${routerDelegationClassName}`).each((i, e) => {
-    const $e = $(e)
-    const slug = $e.attr('href')
-    $e.attr('href', `/${environment}/api/${moduleSlug}/${slug}`)
-  })
-
-  // correct the rest of the links
   $('a[href]').each((i, e) => {
     const $e = $(e)
     const href = $e.attr('href')
@@ -102,11 +94,25 @@ const correctLinks = ($, moduleSlug, environment) => {
   })
 }
 
-const correctHeaderIds = ($, moduleSlug, environment) => {
-  $('h1, h2').each((i, e) => {
+const makeHeaderLinks = ($, moduleSlug, environment) => {
+  // can abstract these two things a bit, but it's late.
+  $('h1').each((i, e) => {
     const $e = $(e)
-    const slug = $e.attr('id')
+    $e.attr('id', moduleSlug)
+    const children = $e.html()
+    const link = $(`<a href="/${environment}/api/${moduleSlug}" class="${routerDelegationClassName}"/>`)
+    link.html(children)
+    $e.empty().append(link)
+  })
+
+  $('h2').each((i, e) => {
+    const $e = $(e)
+    const slug = slugify($e.text())
     $e.attr('id', `${moduleSlug}-${slug}`)
+    const children = $e.html()
+    const link = $(`<a href="/${environment}/api/${moduleSlug}/${slug}" class="${routerDelegationClassName}"/>`)
+    link.html(children)
+    $e.empty().append(link)
   })
 }
 
@@ -115,23 +121,16 @@ const md = markdownIt({
   linkify: true,
   typographer: true,
   highlight
-}).use(anchor, {
-  permalink: true,
-  permalinkClass: routerDelegationClassName,
-  permalinkSymbol: '#',
-  permalinkBefore: true,
-  permalinkHref: (slug) => slug,
-  slugify: slugify
 })
 
 module.exports = function (content) {
   this.cacheable()
   const markup = md.render(content)
   const $markup = cheerio.load(markup)
-  const headers = extractHeaders($markup, 'h2')
   const title = extractHeaders($markup, 'h1')[0]
   correctLinks($markup, title.slug, this.data.environment)
-  correctHeaderIds($markup, title.slug, this.data.environment)
+  makeHeaderLinks($markup, title.slug, this.data.environment)
+  const headers = extractHeaders($markup, 'h2')
   this.value = {
     markup: $markup.html(),
     headers: headers,

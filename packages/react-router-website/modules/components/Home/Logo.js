@@ -3,7 +3,7 @@ import { Block, Row } from 'jsxstyle'
 import { DARK_GRAY } from '../../Theme'
 import LogoImage from '../../logo.png'
 
-const Logo = ({ size }) => (
+const Logo = ({ size = '230px' }) => (
   <Row
     background={DARK_GRAY}
     width={size}
