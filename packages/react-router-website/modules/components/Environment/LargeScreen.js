@@ -124,24 +124,22 @@ const Nav = ({ data, environment }) => (
 
 const API = ({ match, data }) => {
   const { params: { mod, header: headerParam, environment } } = match
-  const doc = data.api.find(doc => mod === doc.title.slug)
+  const doc = mod && data.api.find(doc => mod === doc.title.slug)
   const header = doc && headerParam ? doc.headers.find(h => h.slug === headerParam) : null
-  const invalidHeader = headerParam ? !header : false
+  console.log(mod && !doc)
   return (
     <Block>
-      {doc ? (
-        !invalidHeader ? (
-          <Block>
-            <ScrollToDoc doc={doc} header={header}/>
-            {data.api.map((d, i) => (
-              <MarkdownViewer html={d.markup}/>
-            ))}
-          </Block>
-        ) : (
-          <Redirect to={`/${environment}/api/${mod}`}/>
-        )
-      ) : (
+      <Block>
+        <ScrollToDoc doc={doc} header={header}/>
+        {data.api.map((d, i) => (
+          <MarkdownViewer html={d.markup}/>
+        ))}
+      </Block>
+      {mod && !doc && (
         <Redirect to={`/${environment}/api`}/>
+      )}
+      {headerParam && doc && !header && (
+        <Redirect to={`/${environment}/api/${mod}`}/>
       )}
     </Block>
   )
