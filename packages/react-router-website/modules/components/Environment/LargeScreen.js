@@ -45,12 +45,22 @@ class ScrollY extends Component {
 
 class ScrollToDoc extends Component {
   state = {
-    top: window.scrollY,
-    syncingMotion: false
+    top: 0,
+    syncingMotion: false,
+    mounted: false
   }
 
   componentDidMount() {
-    this.scroll()
+    const top = window.scrollY
+    this.setState({ top }, () => {
+      const browserRestored = top !== 0
+      if (!browserRestored) {
+        this.scroll()
+      }
+      this.setState({
+        mounted: true
+      })
+    })
   }
 
   componentDidUpdate(prevProps) {
@@ -82,8 +92,8 @@ class ScrollToDoc extends Component {
   }
 
   render() {
-    const { top, syncingMotion } = this.state
-    const y = syncingMotion ? top : spring(top)
+    const { top, syncingMotion, mounted } = this.state
+    const y = !mounted || syncingMotion ? top : spring(top)
 
     return (
       <Motion style={{ y }}>
@@ -122,26 +132,33 @@ const Nav = ({ data, environment }) => (
   </Block>
 )
 
-const API = ({ match, data }) => {
+class SaveScroll extends Component {
+  render() {
+    return this.props.children
+  }
+}
+
+const API = ({ match, location, data }) => {
   const { params: { mod, header: headerParam, environment } } = match
   const doc = mod && data.api.find(doc => mod === doc.title.slug)
   const header = doc && headerParam ? doc.headers.find(h => h.slug === headerParam) : null
-  console.log(mod && !doc)
   return (
-    <Block>
-      <Block>
-        <ScrollToDoc doc={doc} header={header}/>
-        {data.api.map((d, i) => (
-          <MarkdownViewer html={d.markup}/>
-        ))}
+    <SaveScroll location={location}>
+      <Block className="api-doc-wrapper">
+        <Block className="api-doc">
+          <ScrollToDoc doc={doc} header={header}/>
+          {data.api.map((d, i) => (
+            <MarkdownViewer html={d.markup}/>
+          ))}
+        </Block>
+        {mod && !doc && (
+          <Redirect to={`/${environment}/api`}/>
+        )}
+        {headerParam && doc && !header && (
+          <Redirect to={`/${environment}/api/${mod}`}/>
+        )}
       </Block>
-      {mod && !doc && (
-        <Redirect to={`/${environment}/api`}/>
-      )}
-      {headerParam && doc && !header && (
-        <Redirect to={`/${environment}/api/${mod}`}/>
-      )}
-    </Block>
+    </SaveScroll>
   )
 }
 
@@ -153,7 +170,7 @@ const Example = () => (
 
 
 const Content = ({ data, match }) => (
-  <Block marginLeft="300px" padding="20px">
+  <Block marginLeft="250px">
     <Switch>
       <Route path={`${match.path}/api/:mod?/:header?`} render={(props) => <API {...props} data={data}/>}/>
       <Route path={`${match.path}/examples/:example`} component={Example} data={data}/>
