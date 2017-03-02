@@ -20,7 +20,7 @@ class Bundle extends Component {
       mod: null
     })
     props.load((mod) => {
-      this.setState({ mod: mod.default })
+      this.setState({ mod: mod.default ? mod.default : mod })
     })
   }
 

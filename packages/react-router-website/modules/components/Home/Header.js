@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { Block, Flex, Row, Inline } from 'jsxstyle'
 import { SMALL_SCREEN, LIGHT_GRAY, BRIGHT_GRAY } from '../../Theme'
-import Logo from './Logo'
+import Logo from '../Logo'
 import SmallScreen from '../SmallScreen'
 
 const NavLink = ({ href, ...props }) => (

@@ -4,7 +4,7 @@ let delegate = (router) => {
   document.body.addEventListener('click', (e) => {
     let node = e.target
     let link = null
-    while (node) {
+    while (node && node.className && typeof node.className === 'string') {
       if (node.className.match(/internal-link/)) {
         e.preventDefault()
         const href = node.getAttribute('href')
