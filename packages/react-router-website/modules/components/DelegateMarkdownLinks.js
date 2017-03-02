@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 
-let delegate = (router) => {
+let delegate = (history) => {
   document.body.addEventListener('click', (e) => {
     let node = e.target
     let link = null
@@ -8,7 +8,7 @@ let delegate = (router) => {
       if (node.className.match(/internal-link/)) {
         e.preventDefault()
         const href = node.getAttribute('href')
-        router.push(href)
+        history.push(href)
         break;
       }
       node = node.parentNode
@@ -20,11 +20,11 @@ let delegate = (router) => {
 class DelegateMarkdownLinks extends Component {
 
   static contextTypes = {
-    router: PropTypes.object
+    history: PropTypes.object
   }
 
   componentDidMount() {
-    delegate(this.context.router)
+    delegate(this.context.history)
   }
 
   render() {

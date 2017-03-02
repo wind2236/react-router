@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
-import LargeScreen from './LargeScreen'
-import Bundle from '../Bundle'
+import EnvironmentLarge from './EnvironmentLarge'
+import Bundle from './Bundle'
 import { Block } from 'jsxstyle'
 
 const envData = {
-  web: require('bundle?lazy!./data/Web'),
-  native: require('bundle?lazy!./data/Native'),
-  core: require('bundle?lazy!./data/Core')
+  web: require('bundle?lazy!../docs/Web'),
+  native: require('bundle?lazy!../docs/Native'),
+  core: require('bundle?lazy!../docs/Core')
 }
 
 class Environment extends Component {
@@ -23,7 +23,7 @@ class Environment extends Component {
     return (
       <Bundle load={envData[environment]}>
         {(data) => data ? (
-          <LargeScreen data={data} match={match}/>
+          <EnvironmentLarge data={data} match={match}/>
         ) : (
           <Block>Loading...</Block>
         )}

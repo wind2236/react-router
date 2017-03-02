@@ -1,6 +1,6 @@
 import React from 'react'
 import { Block, Inline } from 'jsxstyle'
-import { DARK_GRAY, BRIGHT_GRAY, LIGHT_GRAY } from '../../Theme'
+import { DARK_GRAY, BRIGHT_GRAY, LIGHT_GRAY } from '../Theme'
 import NewsletterSignup from './NewsletterSignup'
 
 const FooterLink = ({ href, ...rest }) => (

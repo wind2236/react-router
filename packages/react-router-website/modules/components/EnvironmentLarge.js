@@ -4,9 +4,9 @@ import { Link, Route, Redirect, Switch } from 'react-router-dom'
 import MarkdownViewer from './MarkdownViewer'
 import SourceViewer from './SourceViewer'
 import { Motion, spring } from 'react-motion'
-import { LIGHT_GRAY, RED } from '../../Theme'
-import Logo from '../Logo'
-import Bundle from '../Bundle'
+import { LIGHT_GRAY, RED } from '../Theme'
+import Logo from './Logo'
+import Bundle from './Bundle'
 import FakeBrowser from './FakeBrowser'
 import Media from 'react-media'
 
@@ -117,7 +117,7 @@ class ScrollToDoc extends Component {
       syncingMotion: true
     }, () => {
       this.setState({
-        top: window.scrollY + el.getBoundingClientRect().top - 80,
+        top: window.scrollY + el.getBoundingClientRect().top - 20,
         syncingMotion: false
       })
     })
@@ -202,15 +202,29 @@ const NavLinks = ({ data, environment }) => (
     <Title>API</Title>
     <Block paddingLeft="10px" fontFamily="Monaco, monospace">
       {data.api.map((item, i) => (
-        <Block
-          key={i}
-          component={Link}
-          hoverTextDecoration="underline"
-          props={{
-            to: `/${environment}/api/${item.title.slug}`
-          }}
-        >
-          {item.title.text}
+        <Block key={i} marginTop="10px">
+          <Block
+            component={Link}
+            hoverTextDecoration="underline"
+            props={{
+              to: `/${environment}/api/${item.title.slug}`
+            }}
+          >
+            {item.title.text}
+          </Block>
+          <Block paddingLeft="10px" fontSize="90%">
+            {item.headers.map((header, i) => (
+              <Block
+                key={i}
+                component={Link}
+                hoverTextDecoration="underline"
+                color={LIGHT_GRAY}
+                props={{
+                  to: `/${environment}/api/${item.title.slug}/${header.slug}`
+                }}
+              >{header.text}</Block>
+            ))}
+          </Block>
         </Block>
       ))}
     </Block>
@@ -231,7 +245,10 @@ const Nav = ({ data, environment }) => (
   >
     <Branding/>
     <Tabs/>
-    <NavLinks data={data} environment={environment}/>
+    <NavLinks
+      data={data}
+      environment={environment}
+    />
   </Block>
 )
 
@@ -346,11 +363,11 @@ const Content = ({ data, match }) => (
   </Block>
 )
 
-const LargeScreen = ({ data, match }) => (
+const EnvironmentLarge = ({ data, match }) => (
   <Block>
     <Nav data={data} environment={match.params.environment}/>
     <Content data={data} match={match}/>
   </Block>
 )
 
-export default LargeScreen
+export default EnvironmentLarge

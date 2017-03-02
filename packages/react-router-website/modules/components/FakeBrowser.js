@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react'
 import { MemoryRouter, Route } from 'react-router-dom'
 import { Block, Col, Row } from 'jsxstyle'
-import { LIGHT_GRAY, GRAY } from '../../Theme'
+import { LIGHT_GRAY, GRAY } from '../Theme'
 
 const LeftArrowIcon = (props) => (
   <svg {...props} fill="currentColor" viewBox="0 0 40 40" preserveAspectRatio="xMidYMid meet">

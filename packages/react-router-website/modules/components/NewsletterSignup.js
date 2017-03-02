@@ -1,7 +1,7 @@
 import React, { PropTypes, Component } from 'react'
 import { Block, Row, Flex } from 'jsxstyle'
-import { DARK_GRAY, RED } from '../../Theme'
-import SmallScreen from '../SmallScreen'
+import { DARK_GRAY, RED } from '../Theme'
+import SmallScreen from './SmallScreen'
 
 const Button = ({ children, ...props }) => (
   <Block
